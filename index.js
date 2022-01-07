@@ -21,6 +21,7 @@ async function run() {
     const coursesCollection = database.collection("all-courses");
     const eventsCollection = database.collection("all-events");
     const blogsCollection = database.collection("all-blogs");
+    const usersColletion = database.collection("users");
 
 
     // GET API ALL courses
@@ -30,6 +31,13 @@ async function run() {
       res.send(courses);
 
     });
+
+    //courses post api here 
+    app.post('/all-courses', async (req, res) => {
+      const cursor = await coursesCollection.insertOne(req.body);
+      res.json(cursor)
+    })
+
     // GET API ALL events
     app.get('/all-events', async (req, res) => {
       const cursor = eventsCollection.find({})
@@ -61,8 +69,35 @@ async function run() {
       res.json(result)
     })
 
+    // user api
+    app.post('/users', async (req, res) => {
+      const cursor = await usersColletion.insertOne(req.body);
+      res.json(cursor)
+    })
 
+    // users put api here 
+    app.put('/users', async (req, res) => {
+      const query = { email: req.body.email }
+      const options = { upsert: true }
+      const updateDocs = { $set: req.body }
+      const result = await usersColletion.updateOne(query, updateDocs, options)
+    })
 
+    // admin api
+    app.put('/user/admin', async (req, res) => {
+      const query = { email: req.body.email };
+      const updateDoc = { $set: { role: 'admin' } };
+      const result = await usersColletion.updateOne(query, updateDoc);
+      res.json(result)
+    })
+
+    // users get api 
+    app.get('/user/:email', async (req, res) => {
+      const user = await usersColletion.findOne({ email: req.params.email });
+      let isAdmin = false;
+      if (user?.role === 'admin') { isAdmin = true }
+      res.json({ admin: isAdmin })
+    })
 
   } finally {
     // await client.close();
