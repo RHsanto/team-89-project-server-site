@@ -22,6 +22,8 @@ async function run() {
     const eventsCollection = database.collection("all-events");
     const blogsCollection = database.collection("all-blogs");
     const usersColletion = database.collection("users");
+    const messagesCollections = database.collection("messages");
+    const reviewsCollection = database.collection("reviews");
 
 
     // GET API ALL courses
@@ -36,6 +38,25 @@ async function run() {
     app.post('/all-courses', async (req, res) => {
       const cursor = await coursesCollection.insertOne(req.body);
       res.json(cursor)
+    })
+
+    //course delete api 
+    app.delete('/course/:id', async (req, res) => {
+      const query = { _id: ObjectId(req.params.id) }
+      const result = await coursesCollection.deleteOne(query);
+      res.json(result)
+    })
+
+    // reviews post api 
+    app.post('/reviews', async (req, res) => {
+      const cursor = await reviewsCollection.insertOne(req.body);
+      res.json(cursor);
+    })
+
+    // reviews get api
+    app.get('/reviews', async (req, res) => {
+      const cursor = await reviewsCollection.find({}).toArray();
+      res.json(cursor);
     })
 
     // GET API ALL events
@@ -97,6 +118,18 @@ async function run() {
       let isAdmin = false;
       if (user?.role === 'admin') { isAdmin = true }
       res.json({ admin: isAdmin })
+    })
+
+    // message post  api 
+    app.post('/messages/', async (req, res) => {
+      const cursor = await messagesCollections.insertOne(req.body);
+      res.json(cursor)
+    })
+
+    // message get  api 
+    app.get('/messages/', async (req, res) => {
+      const cursor = await messagesCollections.find({}).toArray();
+      res.json(cursor)
     })
 
   } finally {
