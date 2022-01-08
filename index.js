@@ -24,6 +24,7 @@ async function run() {
     const usersColletion = database.collection("users");
     const messagesCollections = database.collection("messages");
     const reviewsCollection = database.collection("reviews");
+    const ordersCollection = database.collection("orders");
 
 
     // GET API ALL courses
@@ -131,6 +132,34 @@ async function run() {
       const cursor = await messagesCollections.find({}).toArray();
       res.json(cursor)
     })
+
+    // orders post api here 
+    app.post('/orders', async (req, res) => {
+      const result = await ordersCollection.insertOne(req.body);
+      res.json(result);
+    })
+
+    // orders get api here 
+    app.get('/orders', async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result)
+    })
+
+    // delete order api
+    app.delete('/order/:id', async (req, res) => {
+      const query = { _id: ObjectId(req.params.id) }
+      const result = await ordersCollection.deleteOne(query);
+      res.json(result)
+    })
+
+    // order put api 
+    app.put('/order/:id', async (req, res) => {
+      const filter = { _id: ObjectId(req.params.id) }
+      const updateDoc = { $set: { status: 'shipped' } }
+      const result = await ordersCollection.updateOne(filter, updateDoc);
+      res.json(result)
+    });
 
   } finally {
     // await client.close();
